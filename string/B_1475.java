@@ -3,7 +3,10 @@ package string;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
+//https://www.acmicpc.net/problem/1475
+//1475 - 방 번호
+
+public class B_1475 {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

@@ -1,7 +1,7 @@
 package math;
 
 //https://www.acmicpc.net/problem/1193
-//1193 - ºĞ¼öÃ£±â 
+//1193 - ë¶„ìˆ˜ì°¾ê¸°
 //1/1 -> 1/2 -> 2/1 -> 3/1 -> 2/2 ->
 
 import java.util.Scanner;
@@ -24,7 +24,7 @@ public class B_1193 {
 		}
 		plus--;
 		
-		//Ã³À½¿£ Áö±×Àç±×¸¦ ¸øºÃÀ½. plus°¡ ÇÑ¹ø ´õ ´õÇØÁø°Í ´©¶ô
+		//ì²˜ìŒì—” ì§€ê·¸ì¬ê·¸ë¥¼ ëª»ë´¤ìŒ. plusê°€ í•œë²ˆ ë” ë”í•´ì§„ê²ƒ ëˆ„ë½
 		if (plus%2 == 1) {
 			System.out.println((1+X-n)+"/"+(plus+1-X+n));
 		} else {
