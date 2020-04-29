@@ -1,164 +1,91 @@
 //bit연산으로 체크하는 방법
 package string;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 //https://www.acmicpc.net/problem/1062
 //1062 - 가르침
 
 public class B_1062 {
-	static int N,K;
-	static int []word;
-	static int[][] dp;
-	static int def;
-	static int goal;
-	static int result;
-	static int all;
-
-	public static void main(String[] args) {
-		Scanner sc=new Scanner(System.in);
-		N=sc.nextInt();
-		K=sc.nextInt()-5;
-
-		def=(1<<('a'-97))+(1<<('c'-97))+(1<<('i'-97))+(1<<('n'-97))+(1<<('t'-97));
-		//a,c,i,n,t
-		word=new int[N];
-
-		for(int i=0;i<N;i++){
-			String tmp=sc.next();
-
-			if(tmp.length()>8){
-				for(int j=4;j<tmp.length()-4;j++){
-					int tmp1=tmp.charAt(j)-97;
-					if((def & (1<<tmp1))==0){
-						word[i]=word[i]|(1<<tmp1);
-						
-						if((goal & (1<<tmp1))==0){
-							all++;
-							goal=goal|1<<tmp1;
-						}
+	static int result = 0;
+	static int N;
+	static int K;
+	static int [] word;
+	static int allWord;
+	public static void main(String[] args){
+		Scanner sc = new Scanner(System.in);
+		N = sc.nextInt();
+		K = sc.nextInt();
+		String [] str = new String[N];
+		
+		for (int i = 0; i < N; i++) {
+			str[i] = sc.next();
+		}
+		
+		if(K < 5) {
+			System.out.println("0");
+			return;
+		}
+		
+		//default : a,c,i,n,t
+		int def = 1<<('a'-'a') | 1<<('c'-'a') | 1<<('i'-'a') | 1<<('n'-'a') | 1<<('t'-'a');
+		word = new int[N];
+		allWord = 0;
+		int allCnt = 5;
+		
+		//a,c,i,n,t 를 제외한 나머지 알파벳을 allWord, word 배열에 저장
+		for (int i = 0; i < N; i++) {
+			for (int j = 4; j < str[i].length()-4; j++) {
+				int tmp = 1<<(str[i].charAt(j)-'a');
+				if ((def & tmp) == 0) {
+					word[i] = word[i] | tmp;
+				
+					//여기 조건 안걸면 에러남
+					if ((allWord & tmp)==0){
+						allCnt++;							
 					}
 				}
 			}
-			goal=(goal|(word[i]));
+			allWord = allWord | word[i];
 		}
-
-		sc.close();
-		/*int a='a';	//-97
-		System.out.println(a);*/
-
-		if(K<0){
-			System.out.println(0);
-			return;
-		}
-
-		if(K==0){
-			for(int i=0;i<N;i++){
-				if(word[i]==0)
+		
+		if (K == 5){
+			for (int i = 0; i < N; i++){
+				if (word[i] == 0)
 					result++;
 			}
 			System.out.println(result);
 			return;
 		}
-
-		if(K>=all){
+		
+		//이부분을 주석처리하면 오답. 밑의 DFS 첫문장 if (kCnt == K-5) 에서 안걸리기 때문
+		if (K >= allCnt){
 			System.out.println(N);
 			return;
 		}
-
-		//System.out.println(def);
-		//System.out.println(word[1]);
-
-		DFS(0,0,1);
-
-		System.out.println(result);
-	}
-
-	static void DFS(int kCnt, int mask,int maxBit){
-		if(kCnt==K){
-			//System.out.println(mask);
-			int cnt=0;
-			for(int i=0;i<N;i++){
-				if((mask & word[i])==word[i])
-					cnt++;
-			}
-			if(result<cnt) result=cnt;
-			return;
-		}
-
-		if(result==N) return;
-
-		for(int i=maxBit;i<26;i++){
-			if((goal & 1<<i)!=0){
-				DFS(kCnt+1, (mask | (1<<i)),i+1);
-			}
-		}
-	}
-	
-	//시간초과
-	/*
-	//전체 단어에서 사용된 알파벳 체크 
-	static ArrayList<Integer> checkAll = new ArrayList<Integer>();
-	//실제 가르칠 알파벳 체크
-	static boolean [] checked = new boolean[26];
-	static int K;
-	static int N;
-	static int result = 0;
-	static int [] alphaCnt;
-	static boolean [][] checkStr;
-	public static void main(String[] args){
-		Scanner sc = new Scanner(System.in);
-		N = sc.nextInt();
-		K = sc.nextInt();
-		StringBuffer [] str = new StringBuffer[N];
 		
-		for (int i = 0; i < N; i++) {
-			StringBuffer tmp = new StringBuffer();
-			tmp.append(sc.next());
-			tmp.delete(tmp.length()-4, tmp.length());
-			tmp.delete(0, 4);
-			str[i] = tmp;
-		}
+		DFS(0,0,0);
 		
-		//각 단어에서 사용된 알파벳 개수
-		alphaCnt = new int[N];
-		//각 단어에서 사용된 알파벳 체크
-		checkStr = new boolean[N][26];
-		
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < str[i].length(); j++) {
-				checkAll.add(str[i].charAt(j)-'a');
-				checkStr[i][str[i].charAt(j)-'a'] = true;
-				alphaCnt[i]++;
-			}
-		}
-		BruteForce(0,0);
 		System.out.println(result);
 	}
 	
-	static void BruteForce(int cnt, int index) {
-		if (cnt == K) {
-			int count = 0;
+	static void DFS(int kCnt, int mask, int bIndex) {
+		if (kCnt == K-5) {	//default 알파벳을 제외한 개수
+			int cnt = 0;
 			for (int i = 0; i < N; i++) {
-				int alpha = 0;
-				for (int j = 0; j < checkAll.size(); j++) {
-					if (checked[checkAll.get(j)] && checkStr[i][checkAll.get(j)])
-						alpha++;
+				if((word[i] & mask) == word[i]) {
+					cnt++;
 				}
-				if (alpha == alphaCnt[i]) count++;
 			}
-			if (count > result) result = count;
+			if (result < cnt) result = cnt;
 			return;
 		}
-		if (index == checkAll.size()-1) return;
 		
-		for (int i = index; i < checkAll.size(); i++) {
-			if (!checked[checkAll.get(i)]) {
-				checked[checkAll.get(i)] = true;
-				BruteForce(cnt+1, index+1);
+		if (result == N) return;
+		
+		for (int i = bIndex+1; i < 26; i++) {
+			if ((allWord & (1<<i)) != 0) {
+				DFS(kCnt+1, (mask | (1<<i)), i);
 			}
-			checked[checkAll.get(i)] = false;
 		}
 	}
-	*/
 }
